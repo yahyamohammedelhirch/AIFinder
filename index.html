@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIFinder - Découvrir & Comparer les Meilleurs Outils IA</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome pour les icones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Police Google Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* CSS personnalise pour le projet AIFinder - Style Etudiant */
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        /* Titre principal avec degradation de couleur */
+        .titre-gradient {
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Style des cartes pour les outils IA */
+        .my-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            transition: all 0.25s ease-in-out;
+        }
+
+        .my-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-purple);
+            box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Badges de prix */
+        .badge-price {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+        .price-gratuit { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .price-freemium { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .price-payant { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .price-opensource { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+
+        /* Boutons de categories */
+        .btn-cat {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            border-radius: 30px;
+            padding: 6px 16px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-cat:hover, .btn-cat.active {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Bouton coeur favori */
+        .btn-heart {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: #94a3b8;
+            transition: all 0.2s;
+        }
+
+        .btn-heart:hover, .btn-heart.active {
+            color: #ec4899;
+            background: rgba(236, 72, 153, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* Barre fixe de comparaison en bas */
+        .compare-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(150%);
+            z-index: 1050;
+            width: 90%;
+            max-width: 700px;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .compare-bar.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Notification Toast personnalisee */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1100;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR PRINCIPALE -->
+    <nav class="navbar navbar-expand-lg border-bottom border-secondary-subtle sticky-top bg-dark bg-opacity-75 backdrop-blur" style="backdrop-filter: blur(10px);">
+        <div class="container-fluid px-lg-4">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold fs-4" href="#">
+                <span class="p-2 rounded-3 bg-primary bg-gradient text-white d-inline-flex align-items-center justify-content-center" style="width:36px; height:36px;">
+                    <i class="fas fa-brain fs-6"></i>
+                </span>
+                <span class="titre-gradient">AIFinder</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navContent">
+                <!-- Zone de recherche centrale -->
+                <div class="mx-auto col-lg-5 my-2 my-lg-0">
+                    <div class="input-group">
+                        <span class="input-group-text bg-secondary bg-opacity-10 border-secondary border-opacity-25 text-muted">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" id="searchInput" class="form-control bg-secondary bg-opacity-10 border-secondary border-opacity-25" placeholder="Rechercher un outil (ex: ChatGPT, Midjourney, code)..." onkeyup="filtrerOutils()">
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 ms-auto">
+                    <!-- Bouton Quiz Assistant -->
+                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#quizModal">
+                        <i class="fas fa-magic me-1"></i> Quel outil choisir ?
+                    </button>
+
+                    <!-- Bouton Favoris -->
+                    <button class="btn btn-outline-danger btn-sm rounded-pill px-3 position-relative" id="btnFavorisOnly" onclick="toggleAfficherFavoris()">
+                        <i class="fas fa-heart me-1"></i> Favoris
+                        <span class="badge bg-danger rounded-pill ms-1" id="favCount">0</span>
+                    </button>
+
+                    <!-- Bouton Proposer Outil -->
+                    <button class="btn btn-primary btn-sm rounded-pill px-3 bg-gradient border-0 fw-semibold" data-bs-toggle="modal" data-bs-target="#addToolModal">
+                        <i class="fas fa-plus me-1"></i> Ajouter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SECTION HERO / EN-TETE DU SITE -->
+    <div class="container py-4 text-center">
+        <span class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2 mb-3">
+            ⚡ La plateforme N°1 pour comparer les intelligences artificielles
+        </span>
+        <h1 class="display-5 fw-extrabold mb-2">Découvrez & Comparez les Meilleurs <span class="titre-gradient">Outils IA</span></h1>
+        <p class="text-muted col-lg-7 mx-auto">Un annuaire complet et indépendant regroupant les meilleures solutions d'IA pour la rédaction, le code, la création visuelle et la recherche.</p>
+    </div>
+
+    <!-- MAIN CONTAINER (FILTRES + GRILLE DE CARTES) -->
+    <div class="container-fluid px-lg-4 pb-5">
+
+        <!-- Barre de filtres par categorie (pills) -->
+        <div class="d-flex align-items-center gap-2 overflow-x-auto pb-3 mb-3 scrollbar-none" id="categoriesContainer">
+            <button class="btn-cat active" onclick="filtrerCategorie('tous', this)"><i class="fas fa-border-all me-1"></i> Tous</button>
+            <button class="btn-cat" onclick="filtrerCategorie('texte', this)"><i class="fas fa-pen-nib me-1"></i> Texte & Rédaction</button>
+            <button class="btn-cat" onclick="filtrerCategorie('image', this)"><i class="fas fa-image me-1"></i> Image & Design</button>
+            <button class="btn-cat" onclick="filtrerCategorie('code', this)"><i class="fas fa-code me-1"></i> Code & Dev</button>
+            <button class="btn-cat" onclick="filtrerCategorie('audio', this)"><i class="fas fa-music me-1"></i> Audio & Musique</button>
+            <button class="btn-cat" onclick="filtrerCategorie('video', this)"><i class="fas fa-video me-1"></i> Vidéo</button>
+            <button class="btn-cat" onclick="filtrerCategorie('recherche', this)"><i class="fas fa-search me-1"></i> Recherche & Data</button>
+        </div>
+
+        <!-- Deuxieme ligne de filtres: Prix et Tri -->
+        <div class="my-card p-3 mb-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="small text-muted fw-bold me-1"><i class="fas fa-filter me-1"></i> PRIX :</span>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-price-btn active" onclick="filtrerPrix('tous', this)">Tous</button>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-price-btn" onclick="filtrerPrix('Gratuit', this)">Gratuit</button>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-price-btn" onclick="filtrerPrix('Freemium', this)">Freemium</button>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-price-btn" onclick="filtrerPrix('Payant', this)">Payant</button>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-price-btn" onclick="filtrerPrix('Open Source', this)">Open Source</button>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <span class="small text-muted fw-bold me-1"><i class="fas fa-sort me-1"></i> TRIER :</span>
+                <select id="selectTri" class="form-select form-select-sm bg-dark border-secondary border-opacity-50 text-light rounded-pill px-3" onchange="trierOutils()">
+                    <option value="popularite">Plus Populaires</option>
+                    <option value="note">Mieux Notés</option>
+                    <option value="nom">Nom (A-Z)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- GRILLE DES CARTES D'OUTILS -->
+        <div class="row g-4" id="toolsGrid">
+            <!-- Injecte en JS via la fonction afficherOutils() -->
+        </div>
+
+        <!-- Message si aucun resultat -->
+        <div id="noResult" class="text-center py-5 d-none">
+            <i class="fas fa-search-minus fs-1 text-muted mb-3"></i>
+            <h4>Aucun outil ne correspond à vos critères</h4>
+            <p class="text-muted">Essayez de réinitialiser la recherche ou de changer les filtres.</p>
+            <button class="btn btn-outline-primary btn-sm rounded-pill" onclick="resetFiltres()">Réinitialiser les filtres</button>
+        </div>
+    </div>
+
+    <!-- DRAWER / BARRE FIXE DE COMPARAISON -->
+    <div class="compare-bar" id="compareBar">
+        <div class="my-card p-3 bg-dark border-primary shadow-lg d-flex align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-2">
+                <span class="p-2 bg-primary bg-opacity-20 text-primary rounded-3">
+                    <i class="fas fa-balance-scale"></i>
+                </span>
+                <div>
+                    <h6 class="fw-bold mb-0">Comparateur d'outils</h6>
+                    <small class="text-muted" id="compareCount">0 / 3 sélectionné(s)</small>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-outline-danger btn-sm rounded-pill" onclick="viderComparateur()">Vider</button>
+                <button class="btn btn-primary btn-sm rounded-pill px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#compareModal">
+                    Comparer <i class="fas fa-arrow-right ms-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 1: DETAILS D'UN OUTIL -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content my-card text-light">
+                <div class="modal-header border-bottom border-secondary-subtle">
+                    <div class="d-flex align-items-center gap-3" id="modalHeaderContent">
+                        <!-- Rempli par JS -->
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body p-4" id="modalBodyContent">
+                    <!-- Rempli par JS -->
+                </div>
+                <div class="modal-footer border-top border-secondary-subtle justify-content-between">
+                    <button class="btn btn-outline-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Fermer</button>
+                    <a href="#" id="modalSiteBtn" target="_blank" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold">
+                        Visiter le site officiel <i class="fas fa-external-link-alt ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: COMPARATEUR EN TABLEAU -->
+    <div class="modal fade" id="compareModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content my-card text-light">
+                <div class="modal-header border-bottom border-secondary-subtle">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-columns text-primary me-2"></i> Tableau de comparaison</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body p-4 overflow-x-auto">
+                    <table class="table table-bordered table-dark align-middle text-center" id="tableCompare">
+                        <!-- Tableau generé en JS -->
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: QUIZ / WIZARD "TROUVER MON IA" -->
+    <div class="modal fade" id="quizModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content my-card text-light">
+                <div class="modal-header border-bottom border-secondary-subtle">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-magic text-purple me-2"></i> Trouvez votre IA idéale</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="quizStep1">
+                        <h6 class="fw-bold mb-3">1. Quel est votre besoin principal ?</h6>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-secondary text-start p-3" onclick="repondreQuiz('texte')">
+                                <i class="fas fa-pen-nib text-primary me-2"></i> Rédiger des textes ou emails
+                            </button>
+                            <button class="btn btn-outline-secondary text-start p-3" onclick="repondreQuiz('code')">
+                                <i class="fas fa-code text-info me-2"></i> Développer ou déboguer du code
+                            </button>
+                            <button class="btn btn-outline-secondary text-start p-3" onclick="repondreQuiz('image')">
+                                <i class="fas fa-image text-danger me-2"></i> Générer des visuels ou illustrations
+                            </button>
+                            <button class="btn btn-outline-secondary text-start p-3" onclick="repondreQuiz('recherche')">
+                                <i class="fas fa-search text-warning me-2"></i> Faire des recherches et résumés
+                            </button>
+                        </div>
+                    </div>
+                    <div id="quizStep2" class="d-none">
+                        <h6 class="fw-bold mb-3"><i class="fas fa-check-circle text-success me-2"></i> Voici la meilleure recommandation :</h6>
+                        <div id="quizResult" class="p-3 bg-secondary bg-opacity-10 rounded-3 text-center">
+                            <!-- Injection resultat -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: AJOUTER UN OUTIL -->
+    <div class="modal fade" id="addToolModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content my-card text-light">
+                <div class="modal-header border-bottom border-secondary-subtle">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-plus-circle text-primary me-2"></i> Proposer un nouvel outil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <form id="formAddTool" onsubmit="ajouterNouvelOutil(event)">
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Nom de l'outil *</label>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" id="inputNom" placeholder="Ex: DeepSeek" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Catégorie *</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="inputCat" required>
+                                <option value="texte">Texte & Rédaction</option>
+                                <option value="image">Image & Design</option>
+                                <option value="code">Code & Dev</option>
+                                <option value="audio">Audio & Musique</option>
+                                <option value="video">Vidéo</option>
+                                <option value="recherche">Recherche & Data</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Prix *</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="inputPrix" required>
+                                <option value="Gratuit">Gratuit</option>
+                                <option value="Freemium">Freemium</option>
+                                <option value="Payant">Payant</option>
+                                <option value="Open Source">Open Source</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">URL du site officiel *</label>
+                            <input type="url" class="form-control bg-dark text-light border-secondary" id="inputUrl" placeholder="https://..." required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Description courte *</label>
+                            <textarea class="form-control bg-dark text-light border-secondary" id="inputDesc" rows="3" placeholder="Décrivez brièvement l'outil..." required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top border-secondary-subtle">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINERS POUR LES NOTIFICATIONS -->
+    <div class="toast-container">
+        <div id="liveToast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toastMessage">
+                    Action effectuée !
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fermer"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER SIMPLE -->
+    <footer class="py-4 border-top border-secondary border-opacity-25 mt-5 bg-dark">
+        <div class="container text-center text-muted small">
+            <p class="mb-1"><strong>AIFinder</strong> © 2026 — Plateforme de découverte et comparaison d'outils d'intelligence artificielle.</p>
+            <p class="mb-0">Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- CODE JAVASCRIPT MANUSCRIT ETUDIANT -->
+    <script>
+        // =========================================================
+        // 1. BASE DE DONNEES DES OUTILS IA (Tableau d'objets JavaScript)
+        // =========================================================
+        const outilsBase = [
+            {
+                id: "chatgpt",
+                nom: "ChatGPT",
+                logo: "https://placehold.co/100x100/10a37f/ffffff?text=GPT",
+                categorie: "texte",
+                categorieNom: "Texte & Rédaction",
+                prix: "Freemium",
+                note: 4.9,
+                popularite: 98,
+                description: "Agent conversationnel par OpenAI capable de rédiger, synthétiser des textes et vous assister au quotidien.",
+                pointsForts: ["Super polyvalent", "Bonne compréhension du français", "Grand écosystème"],
+                pointsFaibles: ["Limitations de requête sur la version gratuite"],
+                url: "https://chat.openai.com"
+            },
+            {
+                id: "claude",
+                nom: "Claude 3.5 Sonnet",
+                logo: "https://placehold.co/100x100/d97706/ffffff?text=Claude",
+                categorie: "texte",
+                categorieNom: "Texte & Rédaction",
+                prix: "Freemium",
+                note: 4.95,
+                popularite: 95,
+                description: "Le modèle star d'Anthropic très réputé pour sa rédaction naturelle et ses capacités exceptionnelles en programmation.",
+                pointsForts: ["Écriture très naturelle", "Excellentes capacités de dev", "Fenêtre de contexte géante"],
+                pointsFaibles: ["Pas d'accès direct au web en direct"],
+                url: "https://claude.ai"
+            },
+            {
+                id: "midjourney",
+                nom: "Midjourney v6",
+                logo: "https://placehold.co/100x100/3b82f6/ffffff?text=MJ",
+                categorie: "image",
+                categorieNom: "Image & Design",
+                prix: "Payant",
+                note: 4.88,
+                popularite: 93,
+                description: "Générateur d'images à partir de texte offrant le meilleur rendu photoréaliste et artistique du marché.",
+                pointsForts: ["Rendu visuel incroyable", "Contrôle précis du style"],
+                pointsFaibles: ["Pas de plan gratuit disponible"],
+                url: "https://midjourney.com"
+            },
+            {
+                id: "cursor",
+                nom: "Cursor IDE",
+                logo: "https://placehold.co/100x100/6366f1/ffffff?text=Cursor",
+                categorie: "code",
+                categorieNom: "Code & Dev",
+                prix: "Freemium",
+                note: 4.92,
+                popularite: 90,
+                description: "L'éditeur de code révolutionnaire basé sur VS Code intégrant directement l'IA pour coder 3x plus vite.",
+                pointsForts: ["Modifie plusieurs fichiers à la fois", "Très intuitif", "Compatible VS Code"],
+                pointsFaibles: ["Prend un petit temps de prise en main"],
+                url: "https://cursor.com"
+            },
+            {
+                id: "elevenlabs",
+                nom: "ElevenLabs",
+                logo: "https://placehold.co/100x100/ec4899/ffffff?text=11Labs",
+                categorie: "audio",
+                categorieNom: "Audio & Musique",
+                prix: "Freemium",
+                note: 4.85,
+                popularite: 87,
+                description: "Outil de synthèse vocale haute fidélité capable d'imiter des voix humaines et de traduire des sons.",
+                pointsForts: ["Voix réalistes bluffantes", "Clonage vocal rapide"],
+                pointsFaibles: ["Consomme vite ses crédits gratuits"],
+                url: "https://elevenlabs.io"
+            },
+            {
+                id: "perplexity",
+                nom: "Perplexity AI",
+                logo: "https://placehold.co/100x100/06b6d4/ffffff?text=PPLX",
+                categorie: "recherche",
+                categorieNom: "Recherche & Data",
+                prix: "Freemium",
+                note: 4.90,
+                popularite: 94,
+                description: "Moteur de recherche IA qui répond à vos questions en citant ses sources en temps réel.",
+                pointsForts: ["Sources toujours citées", "Données fraîchement mises à jour"],
+                pointsFaibles: ["Réponses parfois courtes"],
+                url: "https://perplexity.ai"
+            },
+            {
+                id: "suno",
+                nom: "Suno AI",
+                logo: "https://placehold.co/100x100/ef4444/ffffff?text=Suno",
+                categorie: "audio",
+                categorieNom: "Audio & Musique",
+                prix: "Freemium",
+                note: 4.82,
+                popularite: 89,
+                description: "Générez des chansons complets avec paroles et instruments dans tous les styles musicaux en quelques secondes.",
+                pointsForts: ["Génère chant et musique", "Facile d'utilisation"],
+                pointsFaibles: ["Droits commerciaux payants"],
+                url: "https://suno.com"
+            },
+            {
+                id: "runway",
+                nom: "Runway Gen-3",
+                logo: "https://placehold.co/100x100/a855f7/ffffff?text=Runway",
+                categorie: "video",
+                categorieNom: "Vidéo",
+                prix: "Freemium",
+                note: 4.75,
+                popularite: 84,
+                description: "Créez et animez des séquences vidéo réalistes à partir d'un prompt texte ou d'une simple image.",
+                pointsForts: ["Super effets vidéo", "Qualité cinéma"],
+                pointsFaibles: ["Temps de génération un peu long"],
+                url: "https://runwayml.com"
+            }
+        ];
+
+        // =========================================================
+        // 2. VARIABLES DE GESTION D'ETAT (STATE LOCAL)
+        // =========================================================
+        // Chargement des favoris depuis localStorage ou tableau vide par defaut
+        let mesFavoris = JSON.parse(localStorage.getItem('aifinder_favs')) || ['chatgpt', 'cursor'];
+        // Charge les outils ajoutes par l'utilisateur
+        let outilsPerso = JSON.parse(localStorage.getItem('aifinder_custom')) || [];
+        
+        // Tous les outils combines
+        let tousLesOutils = [...outilsBase, ...outilsPerso];
+
+        // Filtres actifs
+        let categorieActive = 'tous';
+        let prixActif = 'tous';
+        let triActif = 'popularite';
+        let afficherFavorisSeulement = false;
+
+        // Liste pour la comparaison (Max 3)
+        let listeComparaison = [];
+
+        // =========================================================
+        // 3. FONCTION DE RENDU PRINCIPALE (AFFICHER LES CARTES)
+        // =========================================================
+        function afficherOutils() {
+            const grid = document.getElementById('toolsGrid');
+            const noResult = document.getElementById('noResult');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            // Filtrage des donnees
+            let resultats = tousLesOutils.filter(item => {
+                // Filtre Categorie
+                if (categorieActive !== 'tous' && item.categorie !== categorieActive) return false;
+                
+                // Filtre Prix
+                if (prixActif !== 'tous' && item.prix !== prixActif) return false;
+
+                // Filtre Recherche texte
+                if (searchVal !== '') {
+                    const matchNom = item.nom.toLowerCase().includes(searchVal);
+                    const matchDesc = item.description.toLowerCase().includes(searchVal);
+                    if (!matchNom && !matchDesc) return false;
+                }
+
+                // Filtre Favoris
+                if (afficherFavorisSeulement && !mesFavoris.includes(item.id)) return false;
+
+                return true;
+            });
+
+            // Tri des resultats
+            resultats.sort((a, b) => {
+                if (triActif === 'popularite') return b.popularite - a.popularite;
+                if (triActif === 'note') return b.note - a.note;
+                if (triActif === 'nom') return a.nom.localeCompare(b.nom);
+                return 0;
+            });
+
+            // Affichage si aucun resultat trouvé
+            if (resultats.length === 0) {
+                grid.innerHTML = '';
+                noResult.classList.remove('d-none');
+                return;
+            } else {
+                noResult.classList.add('d-none');
+            }
+
+            // Generation des cartes HTML
+            grid.innerHTML = resultats.map(outil => {
+                const estFav = mesFavoris.includes(outil.id);
+                const estCompare = listeComparaison.includes(outil.id);
+
+                let badgeClass = 'price-freemium';
+                if (outil.prix === 'Gratuit') badgeClass = 'price-gratuit';
+                if (outil.prix === 'Payant') badgeClass = 'price-payant';
+                if (outil.prix === 'Open Source') badgeClass = 'price-opensource';
+
+                return `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="my-card p-4 h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="${outil.logo}" class="rounded-3" style="width:44px; height:44px;" alt="${outil.nom}">
+                                        <div>
+                                            <h5 class="fw-bold mb-0">${outil.nom}</h5>
+                                            <span class="badge ${badgeClass} badge-price">${outil.prix}</span>
+                                        </div>
+                                    </div>
+                                    <button class="btn-heart ${estFav ? 'active' : ''}" onclick="toggleFavori('${outil.id}')" title="Ajouter aux favoris">
+                                        <i class="${estFav ? 'fas' : 'far'} fa-heart"></i>
+                                    </button>
+                                </div>
+
+                                <div class="d-flex align-items-center justify-content-between small text-muted mb-2">
+                                    <span class="text-warning fw-bold"><i class="fas fa-star me-1"></i>${outil.note}</span>
+                                    <span class="badge bg-secondary bg-opacity-20 text-light">${outil.categorieNom}</span>
+                                </div>
+
+                                <p class="text-muted small mb-3">${outil.description}</p>
+                            </div>
+
+                            <div class="pt-3 border-top border-secondary border-opacity-25 d-flex align-items-center justify-content-between">
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" id="chk_${outil.id}" ${estCompare ? 'checked' : ''} onchange="toggleComparer('${outil.id}')">
+                                    <label class="form-check-label small text-muted" for="chk_${outil.id}">Comparer</label>
+                                </div>
+
+                                <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="ouvrirModalDetail('${outil.id}')">
+                                    Détails <i class="fas fa-chevron-right ms-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Mise a jour du compteur de favoris dans la nav
+            document.getElementById('favCount').textContent = mesFavoris.length;
+        }
+
+        // =========================================================
+        // 4. GESTION DES FILTRES ET EVENEMENTS
+        // =========================================================
+        function filtrerCategorie(cat, btn) {
+            categorieActive = cat;
+            document.querySelectorAll('#categoriesContainer .btn-cat').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            afficherOutils();
+        }
+
+        function filtrerPrix(prix, btn) {
+            prixActif = prix;
+            document.querySelectorAll('.filter-price-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            afficherOutils();
+        }
+
+        function filtrerOutils() {
+            afficherOutils();
+        }
+
+        function trierOutils() {
+            triActif = document.getElementById('selectTri').value;
+            afficherOutils();
+        }
+
+        function resetFiltres() {
+            categorieActive = 'tous';
+            prixActif = 'tous';
+            afficherFavorisSeulement = false;
+            document.getElementById('searchInput').value = '';
+            document.querySelectorAll('#categoriesContainer .btn-cat').forEach(b => b.classList.remove('active'));
+            document.querySelector('#categoriesContainer .btn-cat').classList.add('active');
+            afficherOutils();
+        }
+
+        // =========================================================
+        // 5. GESTION DES FAVORIS (LOCALSTORAGE)
+        // =========================================================
+        function toggleFavori(id) {
+            if (mesFavoris.includes(id)) {
+                mesFavoris = mesFavoris.filter(favId => favId !== id);
+                afficherNotification("Retiré des favoris !");
+            } else {
+                mesFavoris.push(id);
+                afficherNotification("Ajouté aux favoris ❤️");
+            }
+            // Sauvegarde dans le navigateur
+            localStorage.setItem('aifinder_favs', JSON.stringify(mesFavoris));
+            afficherOutils();
+        }
+
+        function toggleAfficherFavoris() {
+            afficherFavorisSeulement = !afficherFavorisSeulement;
+            const btn = document.getElementById('btnFavorisOnly');
+            if (afficherFavorisSeulement) {
+                btn.classList.add('active', 'btn-danger');
+                btn.classList.remove('btn-outline-danger');
+            } else {
+                btn.classList.remove('active', 'btn-danger');
+                btn.classList.add('btn-outline-danger');
+            }
+            afficherOutils();
+        }
+
+        // =========================================================
+        // 6. GESTION DU COMPARATEUR
+        // =========================================================
+        function toggleComparer(id) {
+            if (listeComparaison.includes(id)) {
+                listeComparaison = listeComparaison.filter(item => item !== id);
+            } else {
+                if (listeComparaison.length >= 3) {
+                    alert("Vous ne pouvez comparer que 3 outils au maximum !");
+                    document.getElementById('chk_' + id).checked = false;
+                    return;
+                }
+                listeComparaison.push(id);
+            }
+
+            const bar = document.getElementById('compareBar');
+            document.getElementById('compareCount').textContent = `${listeComparaison.length} / 3 sélectionné(s)`;
+            
+            if (listeComparaison.length > 0) {
+                bar.classList.add('visible');
+            } else {
+                bar.classList.remove('visible');
+            }
+            remplirTableauComparatif();
+        }
+
+        function viderComparateur() {
+            listeComparaison = [];
+            document.getElementById('compareBar').classList.remove('visible');
+            afficherOutils();
+        }
+
+        function remplirTableauComparatif() {
+            const table = document.getElementById('tableCompare');
+            const elements = listeComparaison.map(id => tousLesOutils.find(o => o.id === id));
+
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th class="text-start">Critères</th>
+                        ${elements.map(o => `
+                            <th>
+                                <img src="${o.logo}" class="rounded-3 mb-2" style="width:36px; height:36px;" alt="">
+                                <div>${o.nom}</div>
+                            </th>
+                        `).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-start fw-bold text-muted">Catégorie</td>
+                        ${elements.map(o => `<td>${o.categorieNom}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td class="text-start fw-bold text-muted">Tarif</td>
+                        ${elements.map(o => `<td><span class="badge bg-secondary">${o.prix}</span></td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td class="text-start fw-bold text-muted">Note globale</td>
+                        ${elements.map(o => `<td class="text-warning fw-bold">⭐ ${o.note} / 5</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td class="text-start fw-bold text-muted">Points forts</td>
+                        ${elements.map(o => `<td class="small text-start"><ul>${o.pointsForts.map(p => `<li>${p}</li>`).join('')}</ul></td>`).join('')}
+                    </tr>
+                </tbody>
+            `;
+        }
+
+        // =========================================================
+        // 7. MODAL DE DETAILS D'UN OUTIL
+        // =========================================================
+        function ouvrirModalDetail(id) {
+            const outil = tousLesOutils.find(o => o.id === id);
+            if (!outil) return;
+
+            document.getElementById('modalHeaderContent').innerHTML = `
+                <img src="${outil.logo}" class="rounded-3" style="width:48px; height:48px;" alt="">
+                <div>
+                    <h5 class="fw-bold mb-0">${outil.nom}</h5>
+                    <span class="small text-muted">${outil.categorieNom} • Note : ⭐ ${outil.note}</span>
+                </div>
+            `;
+
+            document.getElementById('modalBodyContent').innerHTML = `
+                <p class="lead fs-6 text-light mb-4">${outil.description}</p>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-success bg-opacity-10 border border-success border-opacity-25 rounded-3">
+                            <h6 class="fw-bold text-success"><i class="fas fa-plus-circle me-1"></i> Points Forts</h6>
+                            <ul class="small mb-0 ps-3">
+                                ${outil.pointsForts.map(p => `<li>${p}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded-3">
+                            <h6 class="fw-bold text-danger"><i class="fas fa-minus-circle me-1"></i> Point à savoir</h6>
+                            <ul class="small mb-0 ps-3">
+                                ${(outil.pointsFaibles || ["Rien à signaler"]).map(p => `<li>${p}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('modalSiteBtn').href = outil.url;
+            const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+            modal.show();
+        }
+
+        // =========================================================
+        // 8. FORMULAIRE D'AJOUT D'UN NOUVEL OUTIL (ETUDIANT)
+        // =========================================================
+        function ajouterNouvelOutil(e) {
+            e.preventDefault();
+            
+            const nouveau = {
+                id: "custom_" + Date.now(),
+                nom: document.getElementById('inputNom').value,
+                logo: "https://placehold.co/100x100/6366f1/ffffff?text=AI",
+                categorie: document.getElementById('inputCat').value,
+                categorieNom: document.getElementById('inputCat').options[document.getElementById('inputCat').selectedIndex].text,
+                prix: document.getElementById('inputPrix').value,
+                note: 5.0,
+                popularite: 50,
+                description: document.getElementById('inputDesc').value,
+                pointsForts: ["Ajouté par la communauté"],
+                pointsFaibles: ["Récemment ajouté"],
+                url: document.getElementById('inputUrl').value
+            };
+
+            outilsPerso.push(nouveau);
+            tousLesOutils.push(nouveau);
+            
+            // Sauvegarde dans localStorage
+            localStorage.setItem('aifinder_custom', JSON.stringify(outilsPerso));
+
+            // Fermer le modal et réinitialiser
+            const modalEl = document.getElementById('addToolModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+            document.getElementById('formAddTool').reset();
+
+            afficherOutils();
+            afficherNotification("Outil ajouté avec succès !");
+        }
+
+        // =========================================================
+        // 9. QUIZ INTUITIF ET TOASTS
+        // =========================================================
+        function repondreQuiz(besoin) {
+            const reponse = tousLesOutils.find(o => o.categorie === besoin);
+            const resContainer = document.getElementById('quizResult');
+
+            if (reponse) {
+                resContainer.innerHTML = `
+                    <img src="${reponse.logo}" class="rounded-3 mb-2" style="width:48px; height:48px;" alt="">
+                    <h5 class="fw-bold mb-1">${reponse.nom}</h5>
+                    <p class="small text-muted mb-3">${reponse.description}</p>
+                    <button class="btn btn-primary btn-sm rounded-pill px-4" onclick="ouvrirModalDetail('${reponse.id}')">Voir la fiche</button>
+                `;
+            }
+
+            document.getElementById('quizStep1').classList.add('d-none');
+            document.getElementById('quizStep2').classList.remove('d-none');
+        }
+
+        function afficherNotification(message) {
+            document.getElementById('toastMessage').textContent = message;
+            const toastEl = document.getElementById('liveToast');
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
+        // Reset du modal quiz quand il se ferme
+        document.getElementById('quizModal').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('quizStep1').classList.remove('d-none');
+            document.getElementById('quizStep2').classList.add('d-none');
+        });
+
+        // Lancement au chargement de la page
+        window.onload = function() {
+            afficherOutils();
+        };
+    </script>
+</body>
+</html>
